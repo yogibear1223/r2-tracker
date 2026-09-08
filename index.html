@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f2522">
+<title>R2 Tracker</title>
+<style>
+:root{--bg:#f5f7f2;--card:#fff;--ink:#1f2522;--muted:#68716c;--line:#e0e5e1;--vin:#315d52;--del:#8a704d}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif}
+body{padding:calc(14px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom))}.wrap{max-width:760px;margin:auto}.head{padding:8px 4px 10px}.k{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em}
+h1{font-size:34px;line-height:1.05;margin:5px 0 7px;letter-spacing:-.03em}.sub{font-size:14px;color:var(--muted)}.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin:12px 0;box-shadow:0 3px 16px rgba(0,0,0,.03)}
+.status{display:flex;justify-content:space-between;align-items:center;gap:10px}.pill{padding:8px 11px;border-radius:999px;background:#eef2ee;font-size:13px;font-weight:700}.day{font-size:13px;color:var(--muted)}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.metric{padding:14px;border-radius:16px;background:#f8faf7;border:1px solid #e9ede8}.label{font-size:11px;color:var(--muted);font-weight:800;letter-spacing:.04em}.big{font-size:24px;font-weight:800;margin-top:4px}.small,.note{font-size:12px;color:var(--muted);line-height:1.45}.chartWrap{height:320px;margin-top:10px}.legend{display:flex;gap:15px;flex-wrap:wrap;font-size:12px;color:var(--muted)}.sw{display:inline-block;width:17px;height:3px;border-radius:3px;margin-right:6px;vertical-align:middle}svg{width:100%;height:100%;display:block}.footer{text-align:center;font-size:11px;color:#7d8681;padding:8px}.err{color:#a33}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head"><div class="k">PERSONAL DELIVERY FORECAST</div><h1>R2 Tracker</h1><div class="sub" id="config">Loading configuration…</div></div>
+  <div class="card"><div class="status"><div class="pill" id="status">Loading…</div><div class="day" id="day"></div></div><div class="metrics"><div class="metric"><div class="label">VIN PEAK</div><div class="big" id="vinPeak">—</div><div class="small" id="vinCum">—</div></div><div class="metric"><div class="label">DELIVERY PEAK</div><div class="big" id="delPeak">—</div><div class="small" id="delAfter">—</div></div></div></div>
+  <div class="card"><div style="font-size:18px;font-weight:800">Probability by date</div><div class="note">This chart is loaded from the latest ChatGPT-updated forecast data in this repository.</div><div class="chartWrap"><svg id="chart" viewBox="0 0 720 320" preserveAspectRatio="none"></svg></div><div class="legend"><span><i class="sw" style="background:var(--vin)"></i>VIN assigned</span><span><i class="sw" style="background:var(--del)"></i>Delivery</span><span>Dashed marker = Sep 21</span></div></div>
+  <div class="card"><div style="font-size:16px;font-weight:800">Model note</div><div class="note" id="notes" style="margin-top:7px"></div></div>
+  <div class="footer" id="updated"></div>
+</div>
+<script>
+const cutoffDefault='2026-09-21';
+function fmt(s){return new Date(s+'T12:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'})}
+function diff(a,b){return Math.floor((a-b)/86400000)}
+function maxKey(arr){return [...arr].sort((a,b)=>b.probability-a.probability)[0]?.date}
+function cumulative(arr, thru){return arr.filter(x=>x.date<=thru).reduce((s,x)=>s+x.probability,0)}
+function after(arr, d){return arr.filter(x=>x.date>d).reduce((s,x)=>s+x.probability,0)}
+async function load(){try{const r=await fetch('data.json?ts='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('Could not load data.json');const d=await r.json();render(d)}catch(e){document.getElementById('status').textContent='Update unavailable';document.getElementById('notes').innerHTML='<span class="err">'+e.message+'</span>'}}
+function render(d){const cutoff=d.cutoff_date||cutoffDefault;document.getElementById('config').textContent=fmt(d.order_date)+' order · '+d.configuration;document.getElementById('status').textContent=d.status==='no_vin'?'No official VIN yet':'Official update received';document.getElementById('day').textContent='Day '+Math.max(0,diff(new Date(),new Date(d.order_date+'T12:00:00')))+' since order';document.getElementById('vinPeak').textContent=fmt(d.vin_peak||maxKey(d.vin_probabilities));const by15=d.vin_cumulative?.['2026-09-15'] ?? cumulative(d.vin_probabilities,'2026-09-15');document.getElementById('vinCum').textContent=Math.round(by15)+'% by Sep 15';document.getElementById('delPeak').textContent=fmt(d.delivery_peak||maxKey(d.delivery_probabilities));const aft=d.delivery_after_cutoff ?? after(d.delivery_probabilities,cutoff);document.getElementById('delAfter').textContent=Number(aft).toFixed(1)+'% after Sep 21';document.getElementById('notes').textContent=d.notes||'';document.getElementById('updated').textContent='Forecast updated '+new Date(d.updated_at).toLocaleString();draw(d.vin_probabilities,d.delivery_probabilities,cutoff)}
+function draw(vinArr,delArr,cutoff){const svg=document.getElementById('chart');svg.innerHTML='';const vin=Object.fromEntries(vinArr.map(x=>[x.date,x.probability])),del=Object.fromEntries(delArr.map(x=>[x.date,x.probability]));const dates=[...new Set([...Object.keys(vin),...Object.keys(del)])].sort();if(!dates.length)return;const W=720,H=320,L=46,R=12,T=16,B=44,pw=W-L-R,ph=H-T-B,max=Math.max(16,...Object.values(vin),...Object.values(del))*1.08;const x=i=>L+(dates.length<2?0:i/(dates.length-1))*pw,y=v=>T+ph-(v/max)*ph,NS='http://www.w3.org/2000/svg';const e=(tag,a={})=>{const q=document.createElementNS(NS,tag);for(const[k,v]of Object.entries(a))q.setAttribute(k,v);return q};for(let j=0;j<=4;j++){const val=max*j/4,yy=y(val);svg.appendChild(e('line',{x1:L,y1:yy,x2:W-R,y2:yy,stroke:'#e4e9e5','stroke-width':1}));const tx=e('text',{x:L-7,y:yy+4,'text-anchor':'end',fill:'#7a847e','font-size':11});tx.textContent=Math.round(val)+'%';svg.appendChild(tx)}function path(o){let p='',started=false;dates.forEach((d,i)=>{if(o[d]!=null){p+=(started?' L':'M')+x(i)+' '+y(o[d]);started=true}});return p}svg.appendChild(e('path',{d:path(vin),fill:'none',stroke:'#315d52','stroke-width':3,'stroke-linecap':'round','stroke-linejoin':'round'}));svg.appendChild(e('path',{d:path(del),fill:'none',stroke:'#8a704d','stroke-width':3,'stroke-linecap':'round','stroke-linejoin':'round'}));const ci=dates.indexOf(cutoff);if(ci>=0)svg.appendChild(e('line',{x1:x(ci),y1:T,x2:x(ci),y2:T+ph,stroke:'#9ba49e','stroke-width':1.5,'stroke-dasharray':'5 5'}));const step=Math.max(1,Math.ceil(dates.length/8));dates.forEach((d,i)=>{if(i%step===0||i===dates.length-1){const tx=e('text',{x:x(i),y:H-14,'text-anchor':'middle',fill:'#7a847e','font-size':11});tx.textContent=fmt(d);svg.appendChild(tx)}})}
+load();
+</script>
+</body></html>
