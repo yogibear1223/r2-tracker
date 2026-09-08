@@ -13,6 +13,8 @@ h1{font-size:34px;line-height:1.05;margin:5px 0 7px;letter-spacing:-.03em}.sub{f
 .status{display:flex;justify-content:space-between;align-items:center;gap:10px}.pill{padding:8px 11px;border-radius:999px;background:#eef2ee;font-size:13px;font-weight:700}.day{font-size:13px;color:var(--muted)}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.metric{padding:14px;border-radius:16px;background:#f8faf7;border:1px solid #e9ede8}.label{font-size:11px;color:var(--muted);font-weight:800;letter-spacing:.04em}.big{font-size:24px;font-weight:800;margin-top:4px}.small,.note{font-size:12px;color:var(--muted);line-height:1.45}.chartWrap{height:320px;margin-top:10px;position:relative}.legend{display:flex;gap:15px;flex-wrap:wrap;font-size:12px;color:var(--muted)}.sw{display:inline-block;width:17px;height:3px;border-radius:3px;margin-right:6px;vertical-align:middle}svg{width:100%;height:100%;display:block;touch-action:pan-y}.footer{text-align:center;font-size:11px;color:#7d8681;padding:8px}.err{color:#a33}
 .tooltip{position:absolute;z-index:5;display:none;pointer-events:none;min-width:154px;padding:10px 12px;border-radius:13px;background:rgba(31,37,34,.94);color:#fff;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:12px;line-height:1.35;transform:translateX(-50%);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .tooltip.on{display:block}.tooltip .tdate{font-weight:800;font-size:13px;margin-bottom:6px}.tooltip .trow{display:flex;justify-content:space-between;gap:16px;margin-top:3px}.tooltip .vin{color:#c9e1d8}.tooltip .del{color:#ead6b8}.hint{font-size:11px;color:#7d8681;margin-top:5px}
+.orderTitle{font-size:18px;font-weight:800;margin-bottom:4px}.orderSub{font-size:12px;color:var(--muted);margin-bottom:15px}.orderSection{margin-top:15px}.orderSection:first-of-type{margin-top:0}.sectionLabel{font-size:11px;color:var(--muted);font-weight:800;letter-spacing:.04em;margin-bottom:7px}.orderRow{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid #edf0ed;font-size:13px}.orderRow:last-child{border-bottom:0}.orderRow .desc{min-width:0}.orderRow .price{font-weight:750;white-space:nowrap}.mutedPrice{color:var(--muted);font-weight:650}.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}.chip{font-size:11px;font-weight:650;background:#f1f4f1;border:1px solid #e2e7e3;border-radius:999px;padding:6px 9px;color:#4f5953}.summaryBox{margin-top:15px;background:#f8faf7;border:1px solid #e5eae5;border-radius:16px;padding:13px 14px}.summaryRow{display:flex;justify-content:space-between;gap:14px;padding:5px 0;font-size:13px;color:#58625c}.summaryRow.total{border-top:1px solid #dde3de;margin-top:7px;padding-top:12px;font-size:17px;color:var(--ink);font-weight:800}
+@media(max-width:520px){.orderRow{font-size:12.5px}.summaryRow{font-size:12.5px}.summaryRow.total{font-size:16px}}
 </style>
 </head>
 <body>
@@ -21,6 +23,41 @@ h1{font-size:34px;line-height:1.05;margin:5px 0 7px;letter-spacing:-.03em}.sub{f
   <div class="card"><div class="status"><div class="pill" id="status">Loading…</div><div class="day" id="day"></div></div><div class="metrics"><div class="metric"><div class="label">VIN PEAK</div><div class="big" id="vinPeak">—</div><div class="small" id="vinCum">—</div></div><div class="metric"><div class="label">DELIVERY PEAK</div><div class="big" id="delPeak">—</div><div class="small" id="delAfter">—</div></div></div></div>
   <div class="card"><div style="font-size:18px;font-weight:800">Probability by date</div><div class="note">This chart is loaded from the latest ChatGPT-updated forecast data in this repository.</div><div class="hint">Hover on desktop or tap/drag on iPhone to see exact daily probabilities.</div><div class="chartWrap" id="chartWrap"><svg id="chart" viewBox="0 0 720 320" preserveAspectRatio="none"></svg><div class="tooltip" id="tooltip"></div></div><div class="legend"><span><i class="sw" style="background:var(--vin)"></i>VIN assigned</span><span><i class="sw" style="background:var(--del)"></i>Delivery</span><span>Dashed marker = Sep 21</span></div></div>
   <div class="card"><div style="font-size:16px;font-weight:800">Model note</div><div class="note" id="notes" style="margin-top:7px"></div></div>
+
+  <div class="card">
+    <div class="orderTitle">Order reference</div>
+    <div class="orderSub">Configuration and pricing only · no personal information</div>
+
+    <div class="orderSection">
+      <div class="sectionLabel">VEHICLE & OPTIONS</div>
+      <div class="orderRow"><div class="desc">R2 Performance</div><div class="price">$57,990</div></div>
+      <div class="orderRow"><div class="desc">Launch Green exterior</div><div class="price">$2,000</div></div>
+      <div class="orderRow"><div class="desc">Black Crater Signature interior</div><div class="price mutedPrice">Included</div></div>
+      <div class="orderRow"><div class="desc">21&quot; Liquid Tungsten All-Season wheels</div><div class="price mutedPrice">Included</div></div>
+      <div class="orderRow"><div class="desc">Compact Spare Tire</div><div class="price">$755</div></div>
+      <div class="chips">
+        <span class="chip">AWD Performance</span><span class="chip">Launch Package</span><span class="chip">Autonomy+</span><span class="chip">Tow Package</span><span class="chip">Launch Key Fob</span>
+      </div>
+    </div>
+
+    <div class="orderSection">
+      <div class="sectionLabel">ACCESSORIES</div>
+      <div class="orderRow"><div class="desc">Rivian Portable Charger — NACS</div><div class="price">$400</div></div>
+      <div class="orderRow"><div class="desc">Combo CCS1 Adapter</div><div class="price">$200</div></div>
+      <div class="orderRow"><div class="desc">R2 All Weather Mats</div><div class="price">$225</div></div>
+      <div class="orderRow"><div class="desc">R2 Cargo Cover</div><div class="price">$200</div></div>
+      <div class="orderRow"><div class="desc">R2 Front Sunshade</div><div class="price">$125</div></div>
+      <div class="orderRow"><div class="desc">R2 Screen Protectors</div><div class="price">$65</div></div>
+    </div>
+
+    <div class="summaryBox">
+      <div class="summaryRow"><span>Vehicle subtotal</span><strong>$60,745</strong></div>
+      <div class="summaryRow"><span>Destination fee</span><strong>$1,495</strong></div>
+      <div class="summaryRow"><span>Accessories</span><strong>$1,215</strong></div>
+      <div class="summaryRow total"><span>Order total</span><span>$63,455</span></div>
+    </div>
+  </div>
+
   <div class="footer" id="updated"></div>
 </div>
 <script>
