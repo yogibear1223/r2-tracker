@@ -22,7 +22,7 @@ body{padding:calc(14px + env(safe-area-inset-top)) 14px calc(24px + env(safe-are
 </head>
 <body>
 <div class="wrap">
-  <div class="head"><div class="k">PERSONAL DELIVERY FORECAST</div><div class="headTop"><h1>R2 Tracker</h1><button class="refreshBtn" id="refreshBtn" aria-label="Refresh forecast" title="Refresh forecast">↻</button></div><div class="sub" id="config">Loading configuration…</div></div>
+  <div class="head"><div class="k">PERSONAL DELIVERY FORECAST</div><div class="headTop"><h1>R2 Tracker</h1><button class="refreshBtn" id="refreshBtn" aria-label="Refresh page" title="Refresh page">↻</button></div><div class="sub" id="config">Loading configuration…</div></div>
   <div class="card"><div class="status"><div class="pill" id="status">Loading…</div><div class="day" id="day"></div></div><div class="metrics"><div class="metric"><div class="label">VIN PEAK</div><div class="big" id="vinPeak">—</div><div class="small" id="vinCum">—</div></div><div class="metric"><div class="label">DELIVERY PEAK</div><div class="big" id="delPeak">—</div><div class="small" id="delAfter">—</div></div></div></div>
   <div class="card"><div style="font-size:18px;font-weight:800">Probability by date</div><div class="note">Latest ChatGPT-updated forecast.</div><div class="hint">Tap or drag across the chart on iPhone. Hover on desktop.</div><div class="chartWrap" id="chartWrap"><svg id="chart" preserveAspectRatio="xMidYMid meet"></svg></div><div class="readout" id="readout"><div class="readCell"><div class="readLabel">DATE</div><div class="readValue" id="readDate">Tap chart</div></div><div class="readCell"><div class="readLabel">VIN</div><div class="readValue vin" id="readVin">—</div></div><div class="readCell"><div class="readLabel">DELIVERY</div><div class="readValue del" id="readDel">—</div></div></div><div class="legend"><span><i class="sw" style="background:var(--vin)"></i>VIN assigned</span><span><i class="sw" style="background:var(--del)"></i>Delivery</span><span>Sep 21 marker</span></div></div>
   <div class="card"><div style="font-size:16px;font-weight:800">Model note</div><div class="note" id="notes" style="margin-top:7px"></div></div>
@@ -61,6 +61,6 @@ function draw(vinArr,delArr,cutoff){
  function endTouch(){activeTouch=false;lastIndex=-1}
  hit.addEventListener('pointerup',endTouch);hit.addEventListener('pointercancel',endTouch);hit.addEventListener('pointerleave',ev=>{if(ev.pointerType==='mouse'){hover.setAttribute('opacity',0);vd.setAttribute('opacity',0);dd.setAttribute('opacity',0)}})
 }
-document.getElementById('refreshBtn').addEventListener('click',()=>load(true));window.addEventListener('resize',()=>{if(lastData)render(lastData)});load(false);
+document.getElementById('refreshBtn').addEventListener('click',()=>window.location.reload());window.addEventListener('resize',()=>{if(lastData)render(lastData)});load(false);
 </script>
 </body></html>
