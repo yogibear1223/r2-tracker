@@ -61,6 +61,6 @@ function draw(vinArr,delArr,cutoff){
  function endTouch(){activeTouch=false;lastIndex=-1}
  hit.addEventListener('pointerup',endTouch);hit.addEventListener('pointercancel',endTouch);hit.addEventListener('pointerleave',ev=>{if(ev.pointerType==='mouse'){hover.setAttribute('opacity',0);vd.setAttribute('opacity',0);dd.setAttribute('opacity',0)}})
 }
-document.getElementById('refreshBtn').addEventListener('click',()=>window.location.reload());window.addEventListener('resize',()=>{if(lastData)render(lastData)});load(false);
+document.getElementById('refreshBtn').addEventListener('click',()=>{const u=new URL(window.location.href);u.searchParams.set('_refresh',Date.now().toString());window.location.assign(u.toString())});window.addEventListener('resize',()=>{if(lastData)render(lastData)});load(false);
 </script>
 </body></html>
